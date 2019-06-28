@@ -256,7 +256,9 @@ namespace Microsoft.VisualStudio.IntegrationTest.Utilities.InProcess
         protected Action<CancellationToken> GetExecuteOnActionViewCallback(Action<IWpfTextView> action)
             => cancellationToken =>
             {
+                if (action is null) throw new ArgumentNullException(nameof(action) + "1");
                 var view = GetActiveTextView();
+                if (action is null) throw new ArgumentNullException(nameof(action) + "2");
                 action(view);
             };
 
