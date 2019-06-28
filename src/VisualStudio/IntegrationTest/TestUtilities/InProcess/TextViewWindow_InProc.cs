@@ -216,6 +216,8 @@ namespace Microsoft.VisualStudio.IntegrationTest.Utilities.InProcess
                     view.Selection.Select(new VirtualSnapshotPoint(view.TextSnapshot, originalPosition), new VirtualSnapshotPoint(view.TextSnapshot, newPosition));
                     view.Selection.Mode = selectBlock ? TextSelectionMode.Box : TextSelectionMode.Stream;
                 }
+
+                throw new System.Exception("Don't swallow exceptions");
             });
 
         public int GetCaretPosition()
