@@ -156,9 +156,13 @@ namespace Microsoft.VisualStudio.IntegrationTest.Utilities.InProcess
             => ExecuteOnActiveView(view =>
             {
                 if (view is null) throw new ArgumentNullException(nameof(view));
+                if (view.Caret is null) throw new ArgumentNullException(nameof(view.Caret));
+                if (view.Selection is null) throw new ArgumentNullException(nameof(view.Selection));
 
                 var dte = GetDTE();
                 if (dte is null) throw new ArgumentNullException(nameof(dte));
+                if (dte.Find is null) throw new ArgumentNullException(nameof(dte.Find));
+
                 dte.Find.FindWhat = marker;
                 dte.Find.MatchCase = true;
                 dte.Find.MatchInHiddenText = true;
@@ -166,7 +170,6 @@ namespace Microsoft.VisualStudio.IntegrationTest.Utilities.InProcess
                 dte.Find.Action = EnvDTE.vsFindAction.vsFindActionFind;
 
                 var originalPosition = GetCaretPosition();
-                if (view.Caret is null) throw new ArgumentNullException(nameof(view.Caret));
 
                 view.Caret.MoveTo(new SnapshotPoint(GetBufferContainingCaret(view).CurrentSnapshot, 0));
 
@@ -217,8 +220,6 @@ namespace Microsoft.VisualStudio.IntegrationTest.Utilities.InProcess
 
                 if (extendSelection)
                 {
-                    if (view.Selection is null) throw new ArgumentNullException(nameof(view.Selection));
-
                     var newPosition = view.Selection.ActivePoint.Position.Position;
                     view.Selection.Select(new VirtualSnapshotPoint(view.TextSnapshot, originalPosition), new VirtualSnapshotPoint(view.TextSnapshot, newPosition));
                     view.Selection.Mode = selectBlock ? TextSelectionMode.Box : TextSelectionMode.Stream;
