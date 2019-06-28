@@ -47,14 +47,24 @@ namespace Microsoft.VisualStudio.IntegrationTest.Utilities.InProcess
 
         protected static void InvokeOnUIThread(Action<CancellationToken> action)
         {
+            if (action is null) throw new ArgumentNullException(nameof(action));
+
             using var cancellationTokenSource = new CancellationTokenSource(Helper.HangMitigatingTimeout);
             var operation = JoinableTaskFactory.RunAsync(async () =>
             {
+                if (cancellationTokenSource is null) throw new ArgumentNullException(nameof(cancellationTokenSource));
+
                 await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationTokenSource.Token);
+                if (cancellationTokenSource is null) throw new ArgumentNullException(nameof(cancellationTokenSource));
+
                 cancellationTokenSource.Token.ThrowIfCancellationRequested();
+
+                if (action is null) throw new ArgumentNullException(nameof(action));
 
                 action(cancellationTokenSource.Token);
             });
+
+            if (operation is null) throw new ArgumentNullException(nameof(operation));
 
             operation.Task.Wait(cancellationTokenSource.Token);
         }
