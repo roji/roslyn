@@ -216,8 +216,6 @@ namespace Microsoft.VisualStudio.IntegrationTest.Utilities.InProcess
                     view.Selection.Select(new VirtualSnapshotPoint(view.TextSnapshot, originalPosition), new VirtualSnapshotPoint(view.TextSnapshot, newPosition));
                     view.Selection.Mode = selectBlock ? TextSelectionMode.Box : TextSelectionMode.Stream;
                 }
-
-                throw new System.Exception("Don't swallow exceptions");
             });
 
         public int GetCaretPosition()
@@ -239,11 +237,17 @@ namespace Microsoft.VisualStudio.IntegrationTest.Utilities.InProcess
         }
 
         protected T ExecuteOnActiveView<T>(Func<IWpfTextView, T> action)
-            => InvokeOnUIThread(cancellationToken =>
+        {
+            // The active text view might not have finished composing yet, waiting for the application to 'idle'
+            // means that it is done pumping messages (including WM_PAINT) and the window should return the correct text view
+            WaitForApplicationIdle(Helper.HangMitigatingTimeout);
+
+            return InvokeOnUIThread(cancellationToken =>
             {
                 var view = GetActiveTextView();
                 return action(view);
             });
+        }
 
         protected void ExecuteOnActiveView(Action<IWpfTextView> action)
             => InvokeOnUIThread(GetExecuteOnActionViewCallback(action));
