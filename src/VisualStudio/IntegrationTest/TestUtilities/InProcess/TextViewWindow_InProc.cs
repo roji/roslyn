@@ -155,7 +155,10 @@ namespace Microsoft.VisualStudio.IntegrationTest.Utilities.InProcess
             bool selectBlock)
             => ExecuteOnActiveView(view =>
             {
+                if (view is null) throw new ArgumentNullException(nameof(view));
+
                 var dte = GetDTE();
+                if (dte is null) throw new ArgumentNullException(nameof(dte));
                 dte.Find.FindWhat = marker;
                 dte.Find.MatchCase = true;
                 dte.Find.MatchInHiddenText = true;
@@ -163,6 +166,8 @@ namespace Microsoft.VisualStudio.IntegrationTest.Utilities.InProcess
                 dte.Find.Action = EnvDTE.vsFindAction.vsFindActionFind;
 
                 var originalPosition = GetCaretPosition();
+                if (view.Caret is null) throw new ArgumentNullException(nameof(view.Caret));
+
                 view.Caret.MoveTo(new SnapshotPoint(GetBufferContainingCaret(view).CurrentSnapshot, 0));
 
                 if (occurrence > 0)
@@ -212,6 +217,8 @@ namespace Microsoft.VisualStudio.IntegrationTest.Utilities.InProcess
 
                 if (extendSelection)
                 {
+                    if (view.Selection is null) throw new ArgumentNullException(nameof(view.Selection));
+
                     var newPosition = view.Selection.ActivePoint.Position.Position;
                     view.Selection.Select(new VirtualSnapshotPoint(view.TextSnapshot, originalPosition), new VirtualSnapshotPoint(view.TextSnapshot, newPosition));
                     view.Selection.Mode = selectBlock ? TextSelectionMode.Box : TextSelectionMode.Stream;
@@ -237,17 +244,11 @@ namespace Microsoft.VisualStudio.IntegrationTest.Utilities.InProcess
         }
 
         protected T ExecuteOnActiveView<T>(Func<IWpfTextView, T> action)
-        {
-            // The active text view might not have finished composing yet, waiting for the application to 'idle'
-            // means that it is done pumping messages (including WM_PAINT) and the window should return the correct text view
-            WaitForApplicationIdle(Helper.HangMitigatingTimeout);
-
-            return InvokeOnUIThread(cancellationToken =>
+            => InvokeOnUIThread(cancellationToken =>
             {
                 var view = GetActiveTextView();
                 return action(view);
             });
-        }
 
         protected void ExecuteOnActiveView(Action<IWpfTextView> action)
             => InvokeOnUIThread(GetExecuteOnActionViewCallback(action));

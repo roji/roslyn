@@ -75,6 +75,10 @@ namespace Microsoft.VisualStudio.IntegrationTest.Utilities.InProcess
 
         private static IWpfTextViewHost GetActiveTextViewHost()
         {
+            // The active text view might not have finished composing yet, waiting for the application to 'idle'
+            // means that it is done pumping messages (including WM_PAINT) and the window should return the correct text view
+            WaitForApplicationIdle(Helper.HangMitigatingTimeout);
+
             var (textViewHost, hr) = TryGetActiveTextViewHost();
             Marshal.ThrowExceptionForHR(hr);
             return textViewHost;
