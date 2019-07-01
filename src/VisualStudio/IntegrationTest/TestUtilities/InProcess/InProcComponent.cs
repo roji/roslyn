@@ -5,6 +5,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
 using EnvDTE;
+using Microsoft.CodeAnalysis.ErrorReporting;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -113,21 +114,14 @@ namespace Microsoft.VisualStudio.IntegrationTest.Utilities.InProcess
         /// </summary>
         protected static void WaitForApplicationIdle(TimeSpan timeout)
         {
-            var waitAgain = true;
-            while (waitAgain)
+            try
             {
-                waitAgain = false;
-
-                try
-                {
 #pragma warning disable VSTHRD001 // Avoid legacy thread switching APIs
-                    CurrentApplicationDispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle).Wait(timeout);
+                CurrentApplicationDispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle).Wait(timeout);
 #pragma warning restore VSTHRD001 // Avoid legacy thread switching APIs
-                }
-                catch (Exception)
-                {
-                    waitAgain = true;
-                }
+            }
+            catch (Exception ex) when (FatalError.Report(ex))
+            {
             }
         }
 
