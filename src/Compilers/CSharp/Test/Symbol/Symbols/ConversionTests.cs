@@ -1978,6 +1978,37 @@ public struct S
             CompileAndVerify(source, expectedOutput: @"1ttt");
         }
 
+        [Fact]
+        public void ShayFoo()
+        {
+            var source = @"
+using System;
+using System.Linq.Expressions;
+
+namespace ExpressionTest
+{
+    public struct MyStruct
+    {
+        private static int Foo(int x, int y = 8) => x + y;
+
+        public static void Main()
+        {
+            Expression<Func<int, int>> foo = x => Foo(x);
+            Console.WriteLine(foo);
+
+//            Func<int, int> foo = (x) => Foo(x);
+//            Console.WriteLine(foo(3));
+        }
+    }
+}
+";
+
+            var compilation = CreateCompilationWithMscorlib40AndSystemCore(source, options: TestOptions.ReleaseExe);
+            CompileAndVerify(compilation, expectedOutput: @"
+x => Foo(x, 8)
+");
+        }
+
         [ConditionalFact(typeof(ClrOnly), typeof(DesktopOnly))]
         [WorkItem(545471, "http://vstfdevdiv:8080/DevDiv2/DevDiv/_workitems/edit/545471")]
         [WorkItem(18446, "https://github.com/dotnet/roslyn/issues/18446")]
