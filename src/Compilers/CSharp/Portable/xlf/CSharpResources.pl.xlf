@@ -1357,6 +1357,11 @@
         <target state="translated">Element „{0}” nie może implementować składowej interfejsu „{1}” w typie „{2}”, ponieważ funkcja „{3}” nie jest dostępna w języku C# {4}. Użyj wersji języka „{5}” lub nowszej.</target>
         <note />
       </trans-unit>
+      <trans-unit id="ERR_LeftRightJoinNotSupportedWithInto">
+        <source>Left and right join clauses may not have an 'into' clause.</source>
+        <target state="new">Left and right join clauses may not have an 'into' clause.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="ERR_LineContainsDifferentWhitespace">
         <source>Line contains different whitespace than the closing line of the raw string literal: '{0}' versus '{1}'</source>
         <target state="translated">Wiersz zawiera inny biały znak niż wiersz zamykający literału nieprzetworzonego ciągu: „{0}” a „{1}”</target>

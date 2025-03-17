@@ -421,6 +421,10 @@ namespace Microsoft.CodeAnalysis.CSharp
         FileKeyword = 8449,
         /// <summary>Represents <see langword="allows"/>.</summary>
         AllowsKeyword = 8450,
+        /// <summary>Represents <see langword="left"/>.</summary>
+        LeftKeyword = 8451,
+        /// <summary>Represents <see langword="right"/>.</summary>
+        RightKeyword = 8452,
 
         // when adding a contextual keyword following functions must be adapted:
         // <see cref="SyntaxFacts.GetContextualKeywordKinds()"/>

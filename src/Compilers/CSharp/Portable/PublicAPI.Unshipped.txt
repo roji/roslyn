@@ -1,2 +1,3 @@
 abstract Microsoft.CodeAnalysis.CSharp.InterceptableLocation.Equals(Microsoft.CodeAnalysis.CSharp.InterceptableLocation? other) -> bool
-
+Microsoft.CodeAnalysis.CSharp.SyntaxKind.LeftKeyword = 8451 -> Microsoft.CodeAnalysis.CSharp.SyntaxKind
+Microsoft.CodeAnalysis.CSharp.SyntaxKind.RightKeyword = 8452 -> Microsoft.CodeAnalysis.CSharp.SyntaxKind

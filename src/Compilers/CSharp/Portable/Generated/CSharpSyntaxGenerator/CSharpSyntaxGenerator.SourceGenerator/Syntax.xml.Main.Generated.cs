@@ -1711,7 +1711,7 @@ public partial class CSharpSyntaxRewriter : CSharpSyntaxVisitor<SyntaxNode?>
         => node.Update(VisitToken(node.LetKeyword), VisitToken(node.Identifier), VisitToken(node.EqualsToken), (ExpressionSyntax?)Visit(node.Expression) ?? throw new ArgumentNullException("expression"));
 
     public override SyntaxNode? VisitJoinClause(JoinClauseSyntax node)
-        => node.Update(VisitToken(node.JoinKeyword), (TypeSyntax?)Visit(node.Type), VisitToken(node.Identifier), VisitToken(node.InKeyword), (ExpressionSyntax?)Visit(node.InExpression) ?? throw new ArgumentNullException("inExpression"), VisitToken(node.OnKeyword), (ExpressionSyntax?)Visit(node.LeftExpression) ?? throw new ArgumentNullException("leftExpression"), VisitToken(node.EqualsKeyword), (ExpressionSyntax?)Visit(node.RightExpression) ?? throw new ArgumentNullException("rightExpression"), (JoinIntoClauseSyntax?)Visit(node.Into));
+        => node.Update(VisitToken(node.LeftOrRightKeyword), VisitToken(node.JoinKeyword), (TypeSyntax?)Visit(node.Type), VisitToken(node.Identifier), VisitToken(node.InKeyword), (ExpressionSyntax?)Visit(node.InExpression) ?? throw new ArgumentNullException("inExpression"), VisitToken(node.OnKeyword), (ExpressionSyntax?)Visit(node.LeftExpression) ?? throw new ArgumentNullException("leftExpression"), VisitToken(node.EqualsKeyword), (ExpressionSyntax?)Visit(node.RightExpression) ?? throw new ArgumentNullException("rightExpression"), (JoinIntoClauseSyntax?)Visit(node.Into));
 
     public override SyntaxNode? VisitJoinIntoClause(JoinIntoClauseSyntax node)
         => node.Update(VisitToken(node.IntoKeyword), VisitToken(node.Identifier));
@@ -3477,7 +3477,7 @@ public static partial class SyntaxFactory
         => SyntaxFactory.LetClause(SyntaxFactory.Token(SyntaxKind.LetKeyword), SyntaxFactory.Identifier(identifier), SyntaxFactory.Token(SyntaxKind.EqualsToken), expression);
 
     /// <summary>Creates a new JoinClauseSyntax instance.</summary>
-    public static JoinClauseSyntax JoinClause(SyntaxToken joinKeyword, TypeSyntax? type, SyntaxToken identifier, SyntaxToken inKeyword, ExpressionSyntax inExpression, SyntaxToken onKeyword, ExpressionSyntax leftExpression, SyntaxToken equalsKeyword, ExpressionSyntax rightExpression, JoinIntoClauseSyntax? into)
+    public static JoinClauseSyntax JoinClause(SyntaxToken leftOrRightKeyword, SyntaxToken joinKeyword, TypeSyntax? type, SyntaxToken identifier, SyntaxToken inKeyword, ExpressionSyntax inExpression, SyntaxToken onKeyword, ExpressionSyntax leftExpression, SyntaxToken equalsKeyword, ExpressionSyntax rightExpression, JoinIntoClauseSyntax? into)
     {
         if (joinKeyword.Kind() != SyntaxKind.JoinKeyword) throw new ArgumentException(nameof(joinKeyword));
         if (identifier.Kind() != SyntaxKind.IdentifierToken) throw new ArgumentException(nameof(identifier));
@@ -3487,20 +3487,20 @@ public static partial class SyntaxFactory
         if (leftExpression == null) throw new ArgumentNullException(nameof(leftExpression));
         if (equalsKeyword.Kind() != SyntaxKind.EqualsKeyword) throw new ArgumentException(nameof(equalsKeyword));
         if (rightExpression == null) throw new ArgumentNullException(nameof(rightExpression));
-        return (JoinClauseSyntax)Syntax.InternalSyntax.SyntaxFactory.JoinClause((Syntax.InternalSyntax.SyntaxToken)joinKeyword.Node!, type == null ? null : (Syntax.InternalSyntax.TypeSyntax)type.Green, (Syntax.InternalSyntax.SyntaxToken)identifier.Node!, (Syntax.InternalSyntax.SyntaxToken)inKeyword.Node!, (Syntax.InternalSyntax.ExpressionSyntax)inExpression.Green, (Syntax.InternalSyntax.SyntaxToken)onKeyword.Node!, (Syntax.InternalSyntax.ExpressionSyntax)leftExpression.Green, (Syntax.InternalSyntax.SyntaxToken)equalsKeyword.Node!, (Syntax.InternalSyntax.ExpressionSyntax)rightExpression.Green, into == null ? null : (Syntax.InternalSyntax.JoinIntoClauseSyntax)into.Green).CreateRed();
+        return (JoinClauseSyntax)Syntax.InternalSyntax.SyntaxFactory.JoinClause((Syntax.InternalSyntax.SyntaxToken?)leftOrRightKeyword.Node, (Syntax.InternalSyntax.SyntaxToken)joinKeyword.Node!, type == null ? null : (Syntax.InternalSyntax.TypeSyntax)type.Green, (Syntax.InternalSyntax.SyntaxToken)identifier.Node!, (Syntax.InternalSyntax.SyntaxToken)inKeyword.Node!, (Syntax.InternalSyntax.ExpressionSyntax)inExpression.Green, (Syntax.InternalSyntax.SyntaxToken)onKeyword.Node!, (Syntax.InternalSyntax.ExpressionSyntax)leftExpression.Green, (Syntax.InternalSyntax.SyntaxToken)equalsKeyword.Node!, (Syntax.InternalSyntax.ExpressionSyntax)rightExpression.Green, into == null ? null : (Syntax.InternalSyntax.JoinIntoClauseSyntax)into.Green).CreateRed();
     }
 
     /// <summary>Creates a new JoinClauseSyntax instance.</summary>
-    public static JoinClauseSyntax JoinClause(TypeSyntax? type, SyntaxToken identifier, ExpressionSyntax inExpression, ExpressionSyntax leftExpression, ExpressionSyntax rightExpression, JoinIntoClauseSyntax? into)
-        => SyntaxFactory.JoinClause(SyntaxFactory.Token(SyntaxKind.JoinKeyword), type, identifier, SyntaxFactory.Token(SyntaxKind.InKeyword), inExpression, SyntaxFactory.Token(SyntaxKind.OnKeyword), leftExpression, SyntaxFactory.Token(SyntaxKind.EqualsKeyword), rightExpression, into);
+    public static JoinClauseSyntax JoinClause(SyntaxToken leftOrRightKeyword, TypeSyntax? type, SyntaxToken identifier, ExpressionSyntax inExpression, ExpressionSyntax leftExpression, ExpressionSyntax rightExpression, JoinIntoClauseSyntax? into)
+        => SyntaxFactory.JoinClause(leftOrRightKeyword, SyntaxFactory.Token(SyntaxKind.JoinKeyword), type, identifier, SyntaxFactory.Token(SyntaxKind.InKeyword), inExpression, SyntaxFactory.Token(SyntaxKind.OnKeyword), leftExpression, SyntaxFactory.Token(SyntaxKind.EqualsKeyword), rightExpression, into);
 
     /// <summary>Creates a new JoinClauseSyntax instance.</summary>
     public static JoinClauseSyntax JoinClause(SyntaxToken identifier, ExpressionSyntax inExpression, ExpressionSyntax leftExpression, ExpressionSyntax rightExpression)
-        => SyntaxFactory.JoinClause(SyntaxFactory.Token(SyntaxKind.JoinKeyword), default, identifier, SyntaxFactory.Token(SyntaxKind.InKeyword), inExpression, SyntaxFactory.Token(SyntaxKind.OnKeyword), leftExpression, SyntaxFactory.Token(SyntaxKind.EqualsKeyword), rightExpression, default);
+        => SyntaxFactory.JoinClause(default, SyntaxFactory.Token(SyntaxKind.JoinKeyword), default, identifier, SyntaxFactory.Token(SyntaxKind.InKeyword), inExpression, SyntaxFactory.Token(SyntaxKind.OnKeyword), leftExpression, SyntaxFactory.Token(SyntaxKind.EqualsKeyword), rightExpression, default);
 
     /// <summary>Creates a new JoinClauseSyntax instance.</summary>
     public static JoinClauseSyntax JoinClause(string identifier, ExpressionSyntax inExpression, ExpressionSyntax leftExpression, ExpressionSyntax rightExpression)
-        => SyntaxFactory.JoinClause(SyntaxFactory.Token(SyntaxKind.JoinKeyword), default, SyntaxFactory.Identifier(identifier), SyntaxFactory.Token(SyntaxKind.InKeyword), inExpression, SyntaxFactory.Token(SyntaxKind.OnKeyword), leftExpression, SyntaxFactory.Token(SyntaxKind.EqualsKeyword), rightExpression, default);
+        => SyntaxFactory.JoinClause(default, SyntaxFactory.Token(SyntaxKind.JoinKeyword), default, SyntaxFactory.Identifier(identifier), SyntaxFactory.Token(SyntaxKind.InKeyword), inExpression, SyntaxFactory.Token(SyntaxKind.OnKeyword), leftExpression, SyntaxFactory.Token(SyntaxKind.EqualsKeyword), rightExpression, default);
 
     /// <summary>Creates a new JoinIntoClauseSyntax instance.</summary>
     public static JoinIntoClauseSyntax JoinIntoClause(SyntaxToken intoKeyword, SyntaxToken identifier)

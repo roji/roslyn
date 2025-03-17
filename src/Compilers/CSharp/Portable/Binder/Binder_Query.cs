@@ -138,7 +138,24 @@ namespace Microsoft.CodeAnalysis.CSharp
                     case SyntaxKind.WhereClause:
                         return "Where";
                     case SyntaxKind.JoinClause:
-                        return ((JoinClauseSyntax)firstClause).Into == null ? "Join" : "GroupJoin";
+                        var joinClause = (JoinClauseSyntax)firstClause;
+                        if (joinClause.Into is null)
+                        {
+                            if (joinClause.LeftOrRightKeyword.IsKind(SyntaxKind.LeftKeyword))
+                            {
+                                return "Join"; // TODO: Temporary, until we get .NET
+//                                return "LeftJoin";
+                            }
+                            if (joinClause.LeftOrRightKeyword.IsKind(SyntaxKind.RightKeyword))
+                            {
+                                return "Join"; // TODO: Temporary, until we get .NET
+//                                return "RightJoin";
+                            }
+
+                            return "Join";
+                        }
+
+                        return "GroupJoin";
                     case SyntaxKind.OrderByClause:
                         var firstOrdering = ((OrderByClauseSyntax)firstClause).Orderings.First();
                         return firstOrdering.IsKind(SyntaxKind.DescendingOrdering) ? "OrderByDescending" : "OrderBy";
@@ -423,10 +440,18 @@ namespace Microsoft.CodeAnalysis.CSharp
                     //     ( e1 ) . Join( e2 , x1 => k1 , x2 => k2 , ( x1 , x2 ) => v )
                     var resultSelectorLambda = MakeQueryUnboundLambda(state.RangeVariableMap(), ImmutableArray.Create(x1, x2), select.Expression, diagnostics.AccumulatesDependencies);
 
+                    // var joinMethod = join.LeftOrRightKeyword.IsKind(SyntaxKind.LeftKeyword)
+                    //     ? "LeftJoin"
+                    //     : join.LeftOrRightKeyword.IsKind(SyntaxKind.RightKeyword)
+                    //         ? "RightJoin"
+                    //         : "Join";
+
+                    var joinMethod = "Join";
+
                     invocation = MakeQueryInvocation(
                         join,
                         state.fromExpression,
-                        "Join",
+                        joinMethod,
                         ImmutableArray.Create(inExpression, outerKeySelectorLambda, innerKeySelectorLambda, resultSelectorLambda),
                         diagnostics
 #if DEBUG
@@ -491,10 +516,16 @@ namespace Microsoft.CodeAnalysis.CSharp
                     //     ...
                     var resultSelectorLambda = MakePairLambda(join, state, x1, x2, diagnostics.AccumulatesDependencies);
 
+                    var joinMethod = join.LeftOrRightKeyword.IsKind(SyntaxKind.LeftKeyword)
+                        ? "LeftJoin"
+                        : join.LeftOrRightKeyword.IsKind(SyntaxKind.RightKeyword)
+                            ? "RightJoin"
+                            : "Join";
+
                     invocation = MakeQueryInvocation(
                         join,
                         state.fromExpression,
-                        "Join",
+                        joinMethod,
                         ImmutableArray.Create(inExpression, outerKeySelectorLambda, innerKeySelectorLambda, resultSelectorLambda),
                         diagnostics
 #if DEBUG

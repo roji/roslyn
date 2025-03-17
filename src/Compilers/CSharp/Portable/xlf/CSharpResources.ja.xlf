@@ -1357,6 +1357,11 @@
         <target state="translated">機能 '{3}' は C# {4} では使用できないため、'{0}' は型 '{2}' のインターフェイス メンバー '{1}' を実装できません。'{5}' 以上の言語バージョンをご使用ください。</target>
         <note />
       </trans-unit>
+      <trans-unit id="ERR_LeftRightJoinNotSupportedWithInto">
+        <source>Left and right join clauses may not have an 'into' clause.</source>
+        <target state="new">Left and right join clauses may not have an 'into' clause.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="ERR_LineContainsDifferentWhitespace">
         <source>Line contains different whitespace than the closing line of the raw string literal: '{0}' versus '{1}'</source>
         <target state="translated">行に、生文字列リテラルの終了行とは異なる空白が含まれています: '{0}'と'{1}'</target>

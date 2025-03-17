@@ -1889,6 +1889,10 @@
   </Node>
   <Node Name="JoinClauseSyntax" Base="QueryClauseSyntax">
     <Kind Name="JoinClause"/>
+    <Field Name="LeftOrRightKeyword" Type="SyntaxToken" Optional="true">
+      <ContextualKind Name="LeftKeyword"/>
+      <ContextualKind Name="RightKeyword"/>
+    </Field>
     <Field Name="JoinKeyword" Type="SyntaxToken">
       <Kind Name="JoinKeyword"/>
     </Field>

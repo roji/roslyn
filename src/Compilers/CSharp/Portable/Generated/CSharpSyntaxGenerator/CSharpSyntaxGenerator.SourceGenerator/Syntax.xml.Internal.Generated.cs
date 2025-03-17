@@ -7097,6 +7097,7 @@ internal sealed partial class LetClauseSyntax : QueryClauseSyntax
 
 internal sealed partial class JoinClauseSyntax : QueryClauseSyntax
 {
+    internal readonly SyntaxToken? leftOrRightKeyword;
     internal readonly SyntaxToken joinKeyword;
     internal readonly TypeSyntax? type;
     internal readonly SyntaxToken identifier;
@@ -7108,10 +7109,15 @@ internal sealed partial class JoinClauseSyntax : QueryClauseSyntax
     internal readonly ExpressionSyntax rightExpression;
     internal readonly JoinIntoClauseSyntax? into;
 
-    internal JoinClauseSyntax(SyntaxKind kind, SyntaxToken joinKeyword, TypeSyntax? type, SyntaxToken identifier, SyntaxToken inKeyword, ExpressionSyntax inExpression, SyntaxToken onKeyword, ExpressionSyntax leftExpression, SyntaxToken equalsKeyword, ExpressionSyntax rightExpression, JoinIntoClauseSyntax? into, DiagnosticInfo[]? diagnostics, SyntaxAnnotation[]? annotations)
+    internal JoinClauseSyntax(SyntaxKind kind, SyntaxToken? leftOrRightKeyword, SyntaxToken joinKeyword, TypeSyntax? type, SyntaxToken identifier, SyntaxToken inKeyword, ExpressionSyntax inExpression, SyntaxToken onKeyword, ExpressionSyntax leftExpression, SyntaxToken equalsKeyword, ExpressionSyntax rightExpression, JoinIntoClauseSyntax? into, DiagnosticInfo[]? diagnostics, SyntaxAnnotation[]? annotations)
       : base(kind, diagnostics, annotations)
     {
-        this.SlotCount = 10;
+        this.SlotCount = 11;
+        if (leftOrRightKeyword != null)
+        {
+            this.AdjustFlagsAndWidth(leftOrRightKeyword);
+            this.leftOrRightKeyword = leftOrRightKeyword;
+        }
         this.AdjustFlagsAndWidth(joinKeyword);
         this.joinKeyword = joinKeyword;
         if (type != null)
@@ -7140,11 +7146,16 @@ internal sealed partial class JoinClauseSyntax : QueryClauseSyntax
         }
     }
 
-    internal JoinClauseSyntax(SyntaxKind kind, SyntaxToken joinKeyword, TypeSyntax? type, SyntaxToken identifier, SyntaxToken inKeyword, ExpressionSyntax inExpression, SyntaxToken onKeyword, ExpressionSyntax leftExpression, SyntaxToken equalsKeyword, ExpressionSyntax rightExpression, JoinIntoClauseSyntax? into, SyntaxFactoryContext context)
+    internal JoinClauseSyntax(SyntaxKind kind, SyntaxToken? leftOrRightKeyword, SyntaxToken joinKeyword, TypeSyntax? type, SyntaxToken identifier, SyntaxToken inKeyword, ExpressionSyntax inExpression, SyntaxToken onKeyword, ExpressionSyntax leftExpression, SyntaxToken equalsKeyword, ExpressionSyntax rightExpression, JoinIntoClauseSyntax? into, SyntaxFactoryContext context)
       : base(kind)
     {
         this.SetFactoryContext(context);
-        this.SlotCount = 10;
+        this.SlotCount = 11;
+        if (leftOrRightKeyword != null)
+        {
+            this.AdjustFlagsAndWidth(leftOrRightKeyword);
+            this.leftOrRightKeyword = leftOrRightKeyword;
+        }
         this.AdjustFlagsAndWidth(joinKeyword);
         this.joinKeyword = joinKeyword;
         if (type != null)
@@ -7173,10 +7184,15 @@ internal sealed partial class JoinClauseSyntax : QueryClauseSyntax
         }
     }
 
-    internal JoinClauseSyntax(SyntaxKind kind, SyntaxToken joinKeyword, TypeSyntax? type, SyntaxToken identifier, SyntaxToken inKeyword, ExpressionSyntax inExpression, SyntaxToken onKeyword, ExpressionSyntax leftExpression, SyntaxToken equalsKeyword, ExpressionSyntax rightExpression, JoinIntoClauseSyntax? into)
+    internal JoinClauseSyntax(SyntaxKind kind, SyntaxToken? leftOrRightKeyword, SyntaxToken joinKeyword, TypeSyntax? type, SyntaxToken identifier, SyntaxToken inKeyword, ExpressionSyntax inExpression, SyntaxToken onKeyword, ExpressionSyntax leftExpression, SyntaxToken equalsKeyword, ExpressionSyntax rightExpression, JoinIntoClauseSyntax? into)
       : base(kind)
     {
-        this.SlotCount = 10;
+        this.SlotCount = 11;
+        if (leftOrRightKeyword != null)
+        {
+            this.AdjustFlagsAndWidth(leftOrRightKeyword);
+            this.leftOrRightKeyword = leftOrRightKeyword;
+        }
         this.AdjustFlagsAndWidth(joinKeyword);
         this.joinKeyword = joinKeyword;
         if (type != null)
@@ -7205,6 +7221,7 @@ internal sealed partial class JoinClauseSyntax : QueryClauseSyntax
         }
     }
 
+    public SyntaxToken? LeftOrRightKeyword => this.leftOrRightKeyword;
     public SyntaxToken JoinKeyword => this.joinKeyword;
     public TypeSyntax? Type => this.type;
     /// <summary>Gets the identifier.</summary>
@@ -7220,16 +7237,17 @@ internal sealed partial class JoinClauseSyntax : QueryClauseSyntax
     internal override GreenNode? GetSlot(int index)
         => index switch
         {
-            0 => this.joinKeyword,
-            1 => this.type,
-            2 => this.identifier,
-            3 => this.inKeyword,
-            4 => this.inExpression,
-            5 => this.onKeyword,
-            6 => this.leftExpression,
-            7 => this.equalsKeyword,
-            8 => this.rightExpression,
-            9 => this.into,
+            0 => this.leftOrRightKeyword,
+            1 => this.joinKeyword,
+            2 => this.type,
+            3 => this.identifier,
+            4 => this.inKeyword,
+            5 => this.inExpression,
+            6 => this.onKeyword,
+            7 => this.leftExpression,
+            8 => this.equalsKeyword,
+            9 => this.rightExpression,
+            10 => this.into,
             _ => null,
         };
 
@@ -7238,11 +7256,11 @@ internal sealed partial class JoinClauseSyntax : QueryClauseSyntax
     public override void Accept(CSharpSyntaxVisitor visitor) => visitor.VisitJoinClause(this);
     public override TResult Accept<TResult>(CSharpSyntaxVisitor<TResult> visitor) => visitor.VisitJoinClause(this);
 
-    public JoinClauseSyntax Update(SyntaxToken joinKeyword, TypeSyntax type, SyntaxToken identifier, SyntaxToken inKeyword, ExpressionSyntax inExpression, SyntaxToken onKeyword, ExpressionSyntax leftExpression, SyntaxToken equalsKeyword, ExpressionSyntax rightExpression, JoinIntoClauseSyntax into)
+    public JoinClauseSyntax Update(SyntaxToken leftOrRightKeyword, SyntaxToken joinKeyword, TypeSyntax type, SyntaxToken identifier, SyntaxToken inKeyword, ExpressionSyntax inExpression, SyntaxToken onKeyword, ExpressionSyntax leftExpression, SyntaxToken equalsKeyword, ExpressionSyntax rightExpression, JoinIntoClauseSyntax into)
     {
-        if (joinKeyword != this.JoinKeyword || type != this.Type || identifier != this.Identifier || inKeyword != this.InKeyword || inExpression != this.InExpression || onKeyword != this.OnKeyword || leftExpression != this.LeftExpression || equalsKeyword != this.EqualsKeyword || rightExpression != this.RightExpression || into != this.Into)
+        if (leftOrRightKeyword != this.LeftOrRightKeyword || joinKeyword != this.JoinKeyword || type != this.Type || identifier != this.Identifier || inKeyword != this.InKeyword || inExpression != this.InExpression || onKeyword != this.OnKeyword || leftExpression != this.LeftExpression || equalsKeyword != this.EqualsKeyword || rightExpression != this.RightExpression || into != this.Into)
         {
-            var newNode = SyntaxFactory.JoinClause(joinKeyword, type, identifier, inKeyword, inExpression, onKeyword, leftExpression, equalsKeyword, rightExpression, into);
+            var newNode = SyntaxFactory.JoinClause(leftOrRightKeyword, joinKeyword, type, identifier, inKeyword, inExpression, onKeyword, leftExpression, equalsKeyword, rightExpression, into);
             var diags = GetDiagnostics();
             if (diags?.Length > 0)
                 newNode = newNode.WithDiagnosticsGreen(diags);
@@ -7256,10 +7274,10 @@ internal sealed partial class JoinClauseSyntax : QueryClauseSyntax
     }
 
     internal override GreenNode SetDiagnostics(DiagnosticInfo[]? diagnostics)
-        => new JoinClauseSyntax(this.Kind, this.joinKeyword, this.type, this.identifier, this.inKeyword, this.inExpression, this.onKeyword, this.leftExpression, this.equalsKeyword, this.rightExpression, this.into, diagnostics, GetAnnotations());
+        => new JoinClauseSyntax(this.Kind, this.leftOrRightKeyword, this.joinKeyword, this.type, this.identifier, this.inKeyword, this.inExpression, this.onKeyword, this.leftExpression, this.equalsKeyword, this.rightExpression, this.into, diagnostics, GetAnnotations());
 
     internal override GreenNode SetAnnotations(SyntaxAnnotation[]? annotations)
-        => new JoinClauseSyntax(this.Kind, this.joinKeyword, this.type, this.identifier, this.inKeyword, this.inExpression, this.onKeyword, this.leftExpression, this.equalsKeyword, this.rightExpression, this.into, GetDiagnostics(), annotations);
+        => new JoinClauseSyntax(this.Kind, this.leftOrRightKeyword, this.joinKeyword, this.type, this.identifier, this.inKeyword, this.inExpression, this.onKeyword, this.leftExpression, this.equalsKeyword, this.rightExpression, this.into, GetDiagnostics(), annotations);
 }
 
 internal sealed partial class JoinIntoClauseSyntax : CSharpSyntaxNode
@@ -27206,7 +27224,7 @@ internal partial class CSharpSyntaxRewriter : CSharpSyntaxVisitor<CSharpSyntaxNo
         => node.Update((SyntaxToken)Visit(node.LetKeyword), (SyntaxToken)Visit(node.Identifier), (SyntaxToken)Visit(node.EqualsToken), (ExpressionSyntax)Visit(node.Expression));
 
     public override CSharpSyntaxNode VisitJoinClause(JoinClauseSyntax node)
-        => node.Update((SyntaxToken)Visit(node.JoinKeyword), (TypeSyntax)Visit(node.Type), (SyntaxToken)Visit(node.Identifier), (SyntaxToken)Visit(node.InKeyword), (ExpressionSyntax)Visit(node.InExpression), (SyntaxToken)Visit(node.OnKeyword), (ExpressionSyntax)Visit(node.LeftExpression), (SyntaxToken)Visit(node.EqualsKeyword), (ExpressionSyntax)Visit(node.RightExpression), (JoinIntoClauseSyntax)Visit(node.Into));
+        => node.Update((SyntaxToken)Visit(node.LeftOrRightKeyword), (SyntaxToken)Visit(node.JoinKeyword), (TypeSyntax)Visit(node.Type), (SyntaxToken)Visit(node.Identifier), (SyntaxToken)Visit(node.InKeyword), (ExpressionSyntax)Visit(node.InExpression), (SyntaxToken)Visit(node.OnKeyword), (ExpressionSyntax)Visit(node.LeftExpression), (SyntaxToken)Visit(node.EqualsKeyword), (ExpressionSyntax)Visit(node.RightExpression), (JoinIntoClauseSyntax)Visit(node.Into));
 
     public override CSharpSyntaxNode VisitJoinIntoClause(JoinIntoClauseSyntax node)
         => node.Update((SyntaxToken)Visit(node.IntoKeyword), (SyntaxToken)Visit(node.Identifier));
@@ -29392,7 +29410,7 @@ internal partial class ContextAwareSyntax
         return new LetClauseSyntax(SyntaxKind.LetClause, letKeyword, identifier, equalsToken, expression, this.context);
     }
 
-    public JoinClauseSyntax JoinClause(SyntaxToken joinKeyword, TypeSyntax? type, SyntaxToken identifier, SyntaxToken inKeyword, ExpressionSyntax inExpression, SyntaxToken onKeyword, ExpressionSyntax leftExpression, SyntaxToken equalsKeyword, ExpressionSyntax rightExpression, JoinIntoClauseSyntax? into)
+    public JoinClauseSyntax JoinClause(SyntaxToken? leftOrRightKeyword, SyntaxToken joinKeyword, TypeSyntax? type, SyntaxToken identifier, SyntaxToken inKeyword, ExpressionSyntax inExpression, SyntaxToken onKeyword, ExpressionSyntax leftExpression, SyntaxToken equalsKeyword, ExpressionSyntax rightExpression, JoinIntoClauseSyntax? into)
     {
 #if DEBUG
         if (joinKeyword == null) throw new ArgumentNullException(nameof(joinKeyword));
@@ -29410,7 +29428,7 @@ internal partial class ContextAwareSyntax
         if (rightExpression == null) throw new ArgumentNullException(nameof(rightExpression));
 #endif
 
-        return new JoinClauseSyntax(SyntaxKind.JoinClause, joinKeyword, type, identifier, inKeyword, inExpression, onKeyword, leftExpression, equalsKeyword, rightExpression, into, this.context);
+        return new JoinClauseSyntax(SyntaxKind.JoinClause, leftOrRightKeyword, joinKeyword, type, identifier, inKeyword, inExpression, onKeyword, leftExpression, equalsKeyword, rightExpression, into, this.context);
     }
 
     public JoinIntoClauseSyntax JoinIntoClause(SyntaxToken intoKeyword, SyntaxToken identifier)
@@ -34660,7 +34678,7 @@ internal static partial class SyntaxFactory
         return new LetClauseSyntax(SyntaxKind.LetClause, letKeyword, identifier, equalsToken, expression);
     }
 
-    public static JoinClauseSyntax JoinClause(SyntaxToken joinKeyword, TypeSyntax? type, SyntaxToken identifier, SyntaxToken inKeyword, ExpressionSyntax inExpression, SyntaxToken onKeyword, ExpressionSyntax leftExpression, SyntaxToken equalsKeyword, ExpressionSyntax rightExpression, JoinIntoClauseSyntax? into)
+    public static JoinClauseSyntax JoinClause(SyntaxToken? leftOrRightKeyword, SyntaxToken joinKeyword, TypeSyntax? type, SyntaxToken identifier, SyntaxToken inKeyword, ExpressionSyntax inExpression, SyntaxToken onKeyword, ExpressionSyntax leftExpression, SyntaxToken equalsKeyword, ExpressionSyntax rightExpression, JoinIntoClauseSyntax? into)
     {
 #if DEBUG
         if (joinKeyword == null) throw new ArgumentNullException(nameof(joinKeyword));
@@ -34678,7 +34696,7 @@ internal static partial class SyntaxFactory
         if (rightExpression == null) throw new ArgumentNullException(nameof(rightExpression));
 #endif
 
-        return new JoinClauseSyntax(SyntaxKind.JoinClause, joinKeyword, type, identifier, inKeyword, inExpression, onKeyword, leftExpression, equalsKeyword, rightExpression, into);
+        return new JoinClauseSyntax(SyntaxKind.JoinClause, leftOrRightKeyword, joinKeyword, type, identifier, inKeyword, inExpression, onKeyword, leftExpression, equalsKeyword, rightExpression, into);
     }
 
     public static JoinIntoClauseSyntax JoinIntoClause(SyntaxToken intoKeyword, SyntaxToken identifier)

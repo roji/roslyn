@@ -569,6 +569,111 @@ ITranslatedQueryOperation (OperationKind.TranslatedQuery, Type: System.Collectio
             VerifyOperationTreeAndDiagnosticsForTest<QueryExpressionSyntax>(source, expectedOperationTree, expectedDiagnostics);
         }
 
+        [Fact, /* TODO WorkItem(17838, "https://github.com/dotnet/roslyn/issues/17838") */]
+        public void LeftJoin()
+        {
+            var csSource = LINQ + @"
+class Query
+{
+    public static void Main(string[] args)
+    {
+        List1<int> c1 = new List1<int>(1, 2, 3, 4, 5, 7);
+        List1<int> c2 = new List1<int>(10, 30, 40, 50, 60, 70);
+        List1<int> r = from x1 in c1
+                       left join x2 in c2 on x1 equals x2/10
+                       select x1+x2;
+        Console.WriteLine(r);
+    }
+}";
+            CompileAndVerify(csSource, expectedOutput: "[11, 33, 44, 55, 77]"); // TODO: Temporarily translates to Join
+            // CompileAndVerify(csSource, expectedOutput: "[11, 2, 33, 44, 55, 6, 77]");
+            // CompileAndVerify(csSource, expectedOutput: "[11, 22, 33, 44, 55, 77]", targetFramework: TargetFramework.Net100);
+        }
+
+        [CompilerTrait(CompilerFeature.IOperation)]
+        [Fact, /* TODO WorkItem(17838, "https://github.com/dotnet/roslyn/issues/17838") */]
+        public void FromLeftJoinSelect_IOperation()
+        {
+            throw new NotImplementedException();
+        }
+
+        [Fact, /* TODO WorkItem(17838, "https://github.com/dotnet/roslyn/issues/17838") */]
+        public void RightJoin()
+        {
+            var csSource = LINQ + @"
+class Query
+{
+    public static void Main(string[] args)
+    {
+        List1<int> c1 = new List1<int>(1, 2, 3, 4, 7);
+        List1<int> c2 = new List1<int>(10, 30, 40, 50, 60, 70);
+        List1<int> r = from x1 in c1
+                       right join x2 in c2 on x1 equals x2/10
+                       select x1+x2;
+        Console.WriteLine(r);
+    }
+}";
+            CompileAndVerify(csSource, expectedOutput: "[11, 33, 44, 77]"); // TODO: Temporarily translates to Join
+            // CompileAndVerify(csSource, expectedOutput: "[11, 33, 44, 50, 60, 77]");
+            // CompileAndVerify(csSource, expectedOutput: "[11, 22, 33, 44, 55, 77]", targetFramework: TargetFramework.Net100);
+        }
+
+        [CompilerTrait(CompilerFeature.IOperation)]
+        [Fact, /* TODO WorkItem(17838, "https://github.com/dotnet/roslyn/issues/17838") */]
+        public void FromRightJoinSelect_IOperation()
+        {
+            throw new NotImplementedException();
+        }
+
+        [Fact, /* TODO WorkItem(17838, "https://github.com/dotnet/roslyn/issues/17838") */]
+        public void LeftJoinRightSideIsNullable()
+        {
+            var comp = CreateCompilation(LINQ + """
+class Query
+{
+    public static void Main(string[] args)
+    {
+        List1<string> c1 = new List1<string>("foo", "bar");
+        List1<string> c2 = new List1<string>("foo", "baz");
+        List1<int> r = from x1 in c1
+                       left join x2 in c2 on x1 equals x2
+                       select x1.Length + x2.Length;
+        Console.WriteLine(r);
+    }
+}
+""";
+
+            comp.VerifyDiagnostics(
+                // (755,67): error CS9281: Left and right join clauses may not have an 'into' clause.
+                //                           left join x2 in c2 on x1 equals x2 / 10 into g
+                Diagnostic(ErrorCode.ERR_LeftRightJoinNotSupportedWithInto, "into g").WithLocation(755, 67)
+            );
+       }
+
+        [Fact, /* TODO WorkItem(17838, "https://github.com/dotnet/roslyn/issues/17838") */]
+        public void LeftJoinWithIntoShouldGiveAnError()
+        {
+            var comp = CreateCompilation(LINQ + @"
+class Query
+{
+    public static void Main(string[] args)
+    {
+        List1<int> c1 = new List1<int>(1, 2, 3, 4, 5, 7);
+        List1<int> c2 = new List1<int>(10, 30, 40, 50, 60, 70);
+        List1<string> r = from x1 in c1
+                          left join x2 in c2 on x1 equals x2 / 10 into g
+                          select x1 + "":"" + g.ToString();
+        Console.WriteLine(r);
+    }
+}");
+
+            comp.VerifyDiagnostics(
+                // (755,67): error CS9281: Left and right join clauses may not have an 'into' clause.
+                //                           left join x2 in c2 on x1 equals x2 / 10 into g
+                Diagnostic(ErrorCode.ERR_LeftRightJoinNotSupportedWithInto, "into g").WithLocation(755, 67)
+            );
+        }
+
         [WorkItem(9229, "DevDiv_Projects/Roslyn")]
         [Fact]
         public void OrderBy()

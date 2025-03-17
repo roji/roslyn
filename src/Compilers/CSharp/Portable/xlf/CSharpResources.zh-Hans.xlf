@@ -1357,6 +1357,11 @@
         <target state="translated">“{0}”无法在类型 "{2}" 中实现接口成员 "{1}", 因为功能 "{3}" 在 c # {4} 中不可用。请使用语言版本 "{5}" 或更高版本。</target>
         <note />
       </trans-unit>
+      <trans-unit id="ERR_LeftRightJoinNotSupportedWithInto">
+        <source>Left and right join clauses may not have an 'into' clause.</source>
+        <target state="new">Left and right join clauses may not have an 'into' clause.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="ERR_LineContainsDifferentWhitespace">
         <source>Line contains different whitespace than the closing line of the raw string literal: '{0}' versus '{1}'</source>
         <target state="translated">行包含的空格与原始字符串字面量的右行不同: '{0}' 与 '{1}'</target>

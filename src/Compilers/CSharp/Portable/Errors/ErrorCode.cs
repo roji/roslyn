@@ -2369,6 +2369,8 @@ namespace Microsoft.CodeAnalysis.CSharp
         ERR_PartialEventInitializer = 9279,
         ERR_PartialConstructorInitializer = 9280,
 
+        ERR_LeftRightJoinNotSupportedWithInto = 9281,
+
         // Note: you will need to do the following after adding errors:
         //  1) Update ErrorFacts.IsBuildOnlyDiagnostic (src/Compilers/CSharp/Portable/Errors/ErrorFacts.cs)
 

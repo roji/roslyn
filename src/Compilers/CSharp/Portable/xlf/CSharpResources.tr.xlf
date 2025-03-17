@@ -1357,6 +1357,11 @@
         <target state="translated">'{3}' özelliği C# {4} sürümünde kullanılamadığından '{0}', '{2}' türündeki '{1}' arabirim üyesini uygulayamaz. Lütfen '{5}' veya daha yüksek bir dil sürümü kullanın.</target>
         <note />
       </trans-unit>
+      <trans-unit id="ERR_LeftRightJoinNotSupportedWithInto">
+        <source>Left and right join clauses may not have an 'into' clause.</source>
+        <target state="new">Left and right join clauses may not have an 'into' clause.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="ERR_LineContainsDifferentWhitespace">
         <source>Line contains different whitespace than the closing line of the raw string literal: '{0}' versus '{1}'</source>
         <target state="translated">Satır, ham dize sabit değerinin kapanış satırından farklı boşluk içeriyor: '{0}' şuna karşı: '{1}'</target>

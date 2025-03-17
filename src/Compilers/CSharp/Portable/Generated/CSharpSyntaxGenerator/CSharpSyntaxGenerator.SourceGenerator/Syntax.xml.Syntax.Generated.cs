@@ -4542,57 +4542,66 @@ public sealed partial class JoinClauseSyntax : QueryClauseSyntax
     {
     }
 
-    public SyntaxToken JoinKeyword => new SyntaxToken(this, ((InternalSyntax.JoinClauseSyntax)this.Green).joinKeyword, Position, 0);
+    public SyntaxToken LeftOrRightKeyword
+    {
+        get
+        {
+            var slot = ((Syntax.InternalSyntax.JoinClauseSyntax)this.Green).leftOrRightKeyword;
+            return slot != null ? new SyntaxToken(this, slot, Position, 0) : default;
+        }
+    }
 
-    public TypeSyntax? Type => GetRed(ref this.type, 1);
+    public SyntaxToken JoinKeyword => new SyntaxToken(this, ((InternalSyntax.JoinClauseSyntax)this.Green).joinKeyword, GetChildPosition(1), GetChildIndex(1));
+
+    public TypeSyntax? Type => GetRed(ref this.type, 2);
 
     /// <summary>Gets the identifier.</summary>
-    public SyntaxToken Identifier => new SyntaxToken(this, ((InternalSyntax.JoinClauseSyntax)this.Green).identifier, GetChildPosition(2), GetChildIndex(2));
+    public SyntaxToken Identifier => new SyntaxToken(this, ((InternalSyntax.JoinClauseSyntax)this.Green).identifier, GetChildPosition(3), GetChildIndex(3));
 
-    public SyntaxToken InKeyword => new SyntaxToken(this, ((InternalSyntax.JoinClauseSyntax)this.Green).inKeyword, GetChildPosition(3), GetChildIndex(3));
+    public SyntaxToken InKeyword => new SyntaxToken(this, ((InternalSyntax.JoinClauseSyntax)this.Green).inKeyword, GetChildPosition(4), GetChildIndex(4));
 
-    public ExpressionSyntax InExpression => GetRed(ref this.inExpression, 4)!;
+    public ExpressionSyntax InExpression => GetRed(ref this.inExpression, 5)!;
 
-    public SyntaxToken OnKeyword => new SyntaxToken(this, ((InternalSyntax.JoinClauseSyntax)this.Green).onKeyword, GetChildPosition(5), GetChildIndex(5));
+    public SyntaxToken OnKeyword => new SyntaxToken(this, ((InternalSyntax.JoinClauseSyntax)this.Green).onKeyword, GetChildPosition(6), GetChildIndex(6));
 
-    public ExpressionSyntax LeftExpression => GetRed(ref this.leftExpression, 6)!;
+    public ExpressionSyntax LeftExpression => GetRed(ref this.leftExpression, 7)!;
 
-    public SyntaxToken EqualsKeyword => new SyntaxToken(this, ((InternalSyntax.JoinClauseSyntax)this.Green).equalsKeyword, GetChildPosition(7), GetChildIndex(7));
+    public SyntaxToken EqualsKeyword => new SyntaxToken(this, ((InternalSyntax.JoinClauseSyntax)this.Green).equalsKeyword, GetChildPosition(8), GetChildIndex(8));
 
-    public ExpressionSyntax RightExpression => GetRed(ref this.rightExpression, 8)!;
+    public ExpressionSyntax RightExpression => GetRed(ref this.rightExpression, 9)!;
 
-    public JoinIntoClauseSyntax? Into => GetRed(ref this.into, 9);
+    public JoinIntoClauseSyntax? Into => GetRed(ref this.into, 10);
 
     internal override SyntaxNode? GetNodeSlot(int index)
         => index switch
         {
-            1 => GetRed(ref this.type, 1),
-            4 => GetRed(ref this.inExpression, 4)!,
-            6 => GetRed(ref this.leftExpression, 6)!,
-            8 => GetRed(ref this.rightExpression, 8)!,
-            9 => GetRed(ref this.into, 9),
+            2 => GetRed(ref this.type, 2),
+            5 => GetRed(ref this.inExpression, 5)!,
+            7 => GetRed(ref this.leftExpression, 7)!,
+            9 => GetRed(ref this.rightExpression, 9)!,
+            10 => GetRed(ref this.into, 10),
             _ => null,
         };
 
     internal override SyntaxNode? GetCachedSlot(int index)
         => index switch
         {
-            1 => this.type,
-            4 => this.inExpression,
-            6 => this.leftExpression,
-            8 => this.rightExpression,
-            9 => this.into,
+            2 => this.type,
+            5 => this.inExpression,
+            7 => this.leftExpression,
+            9 => this.rightExpression,
+            10 => this.into,
             _ => null,
         };
 
     public override void Accept(CSharpSyntaxVisitor visitor) => visitor.VisitJoinClause(this);
     public override TResult? Accept<TResult>(CSharpSyntaxVisitor<TResult> visitor) where TResult : default => visitor.VisitJoinClause(this);
 
-    public JoinClauseSyntax Update(SyntaxToken joinKeyword, TypeSyntax? type, SyntaxToken identifier, SyntaxToken inKeyword, ExpressionSyntax inExpression, SyntaxToken onKeyword, ExpressionSyntax leftExpression, SyntaxToken equalsKeyword, ExpressionSyntax rightExpression, JoinIntoClauseSyntax? into)
+    public JoinClauseSyntax Update(SyntaxToken leftOrRightKeyword, SyntaxToken joinKeyword, TypeSyntax? type, SyntaxToken identifier, SyntaxToken inKeyword, ExpressionSyntax inExpression, SyntaxToken onKeyword, ExpressionSyntax leftExpression, SyntaxToken equalsKeyword, ExpressionSyntax rightExpression, JoinIntoClauseSyntax? into)
     {
-        if (joinKeyword != this.JoinKeyword || type != this.Type || identifier != this.Identifier || inKeyword != this.InKeyword || inExpression != this.InExpression || onKeyword != this.OnKeyword || leftExpression != this.LeftExpression || equalsKeyword != this.EqualsKeyword || rightExpression != this.RightExpression || into != this.Into)
+        if (leftOrRightKeyword != this.LeftOrRightKeyword || joinKeyword != this.JoinKeyword || type != this.Type || identifier != this.Identifier || inKeyword != this.InKeyword || inExpression != this.InExpression || onKeyword != this.OnKeyword || leftExpression != this.LeftExpression || equalsKeyword != this.EqualsKeyword || rightExpression != this.RightExpression || into != this.Into)
         {
-            var newNode = SyntaxFactory.JoinClause(joinKeyword, type, identifier, inKeyword, inExpression, onKeyword, leftExpression, equalsKeyword, rightExpression, into);
+            var newNode = SyntaxFactory.JoinClause(leftOrRightKeyword, joinKeyword, type, identifier, inKeyword, inExpression, onKeyword, leftExpression, equalsKeyword, rightExpression, into);
             var annotations = GetAnnotations();
             return annotations?.Length > 0 ? newNode.WithAnnotations(annotations) : newNode;
         }
@@ -4600,16 +4609,17 @@ public sealed partial class JoinClauseSyntax : QueryClauseSyntax
         return this;
     }
 
-    public JoinClauseSyntax WithJoinKeyword(SyntaxToken joinKeyword) => Update(joinKeyword, this.Type, this.Identifier, this.InKeyword, this.InExpression, this.OnKeyword, this.LeftExpression, this.EqualsKeyword, this.RightExpression, this.Into);
-    public JoinClauseSyntax WithType(TypeSyntax? type) => Update(this.JoinKeyword, type, this.Identifier, this.InKeyword, this.InExpression, this.OnKeyword, this.LeftExpression, this.EqualsKeyword, this.RightExpression, this.Into);
-    public JoinClauseSyntax WithIdentifier(SyntaxToken identifier) => Update(this.JoinKeyword, this.Type, identifier, this.InKeyword, this.InExpression, this.OnKeyword, this.LeftExpression, this.EqualsKeyword, this.RightExpression, this.Into);
-    public JoinClauseSyntax WithInKeyword(SyntaxToken inKeyword) => Update(this.JoinKeyword, this.Type, this.Identifier, inKeyword, this.InExpression, this.OnKeyword, this.LeftExpression, this.EqualsKeyword, this.RightExpression, this.Into);
-    public JoinClauseSyntax WithInExpression(ExpressionSyntax inExpression) => Update(this.JoinKeyword, this.Type, this.Identifier, this.InKeyword, inExpression, this.OnKeyword, this.LeftExpression, this.EqualsKeyword, this.RightExpression, this.Into);
-    public JoinClauseSyntax WithOnKeyword(SyntaxToken onKeyword) => Update(this.JoinKeyword, this.Type, this.Identifier, this.InKeyword, this.InExpression, onKeyword, this.LeftExpression, this.EqualsKeyword, this.RightExpression, this.Into);
-    public JoinClauseSyntax WithLeftExpression(ExpressionSyntax leftExpression) => Update(this.JoinKeyword, this.Type, this.Identifier, this.InKeyword, this.InExpression, this.OnKeyword, leftExpression, this.EqualsKeyword, this.RightExpression, this.Into);
-    public JoinClauseSyntax WithEqualsKeyword(SyntaxToken equalsKeyword) => Update(this.JoinKeyword, this.Type, this.Identifier, this.InKeyword, this.InExpression, this.OnKeyword, this.LeftExpression, equalsKeyword, this.RightExpression, this.Into);
-    public JoinClauseSyntax WithRightExpression(ExpressionSyntax rightExpression) => Update(this.JoinKeyword, this.Type, this.Identifier, this.InKeyword, this.InExpression, this.OnKeyword, this.LeftExpression, this.EqualsKeyword, rightExpression, this.Into);
-    public JoinClauseSyntax WithInto(JoinIntoClauseSyntax? into) => Update(this.JoinKeyword, this.Type, this.Identifier, this.InKeyword, this.InExpression, this.OnKeyword, this.LeftExpression, this.EqualsKeyword, this.RightExpression, into);
+    public JoinClauseSyntax WithLeftOrRightKeyword(SyntaxToken leftOrRightKeyword) => Update(leftOrRightKeyword, this.JoinKeyword, this.Type, this.Identifier, this.InKeyword, this.InExpression, this.OnKeyword, this.LeftExpression, this.EqualsKeyword, this.RightExpression, this.Into);
+    public JoinClauseSyntax WithJoinKeyword(SyntaxToken joinKeyword) => Update(this.LeftOrRightKeyword, joinKeyword, this.Type, this.Identifier, this.InKeyword, this.InExpression, this.OnKeyword, this.LeftExpression, this.EqualsKeyword, this.RightExpression, this.Into);
+    public JoinClauseSyntax WithType(TypeSyntax? type) => Update(this.LeftOrRightKeyword, this.JoinKeyword, type, this.Identifier, this.InKeyword, this.InExpression, this.OnKeyword, this.LeftExpression, this.EqualsKeyword, this.RightExpression, this.Into);
+    public JoinClauseSyntax WithIdentifier(SyntaxToken identifier) => Update(this.LeftOrRightKeyword, this.JoinKeyword, this.Type, identifier, this.InKeyword, this.InExpression, this.OnKeyword, this.LeftExpression, this.EqualsKeyword, this.RightExpression, this.Into);
+    public JoinClauseSyntax WithInKeyword(SyntaxToken inKeyword) => Update(this.LeftOrRightKeyword, this.JoinKeyword, this.Type, this.Identifier, inKeyword, this.InExpression, this.OnKeyword, this.LeftExpression, this.EqualsKeyword, this.RightExpression, this.Into);
+    public JoinClauseSyntax WithInExpression(ExpressionSyntax inExpression) => Update(this.LeftOrRightKeyword, this.JoinKeyword, this.Type, this.Identifier, this.InKeyword, inExpression, this.OnKeyword, this.LeftExpression, this.EqualsKeyword, this.RightExpression, this.Into);
+    public JoinClauseSyntax WithOnKeyword(SyntaxToken onKeyword) => Update(this.LeftOrRightKeyword, this.JoinKeyword, this.Type, this.Identifier, this.InKeyword, this.InExpression, onKeyword, this.LeftExpression, this.EqualsKeyword, this.RightExpression, this.Into);
+    public JoinClauseSyntax WithLeftExpression(ExpressionSyntax leftExpression) => Update(this.LeftOrRightKeyword, this.JoinKeyword, this.Type, this.Identifier, this.InKeyword, this.InExpression, this.OnKeyword, leftExpression, this.EqualsKeyword, this.RightExpression, this.Into);
+    public JoinClauseSyntax WithEqualsKeyword(SyntaxToken equalsKeyword) => Update(this.LeftOrRightKeyword, this.JoinKeyword, this.Type, this.Identifier, this.InKeyword, this.InExpression, this.OnKeyword, this.LeftExpression, equalsKeyword, this.RightExpression, this.Into);
+    public JoinClauseSyntax WithRightExpression(ExpressionSyntax rightExpression) => Update(this.LeftOrRightKeyword, this.JoinKeyword, this.Type, this.Identifier, this.InKeyword, this.InExpression, this.OnKeyword, this.LeftExpression, this.EqualsKeyword, rightExpression, this.Into);
+    public JoinClauseSyntax WithInto(JoinIntoClauseSyntax? into) => Update(this.LeftOrRightKeyword, this.JoinKeyword, this.Type, this.Identifier, this.InKeyword, this.InExpression, this.OnKeyword, this.LeftExpression, this.EqualsKeyword, this.RightExpression, into);
 }
 
 /// <remarks>

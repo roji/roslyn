@@ -1357,6 +1357,11 @@
         <target state="translated">'{0}' non può implementare il membro di interfaccia '{1}' nel tipo '{2}' perché la funzionalità '{3}' non è disponibile in C# {4}. Usare la versione '{5}' o versioni successive del linguaggio.</target>
         <note />
       </trans-unit>
+      <trans-unit id="ERR_LeftRightJoinNotSupportedWithInto">
+        <source>Left and right join clauses may not have an 'into' clause.</source>
+        <target state="new">Left and right join clauses may not have an 'into' clause.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="ERR_LineContainsDifferentWhitespace">
         <source>Line contains different whitespace than the closing line of the raw string literal: '{0}' versus '{1}'</source>
         <target state="translated">La riga contiene spazi vuoti diversi rispetto alla riga di chiusura del valore letterale stringa non elaborata: '{0}' rispetto a '{1}'</target>

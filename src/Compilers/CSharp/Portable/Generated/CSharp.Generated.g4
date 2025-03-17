@@ -1054,7 +1054,7 @@ query_clause
   ;
 
 join_clause
-  : 'join' type? identifier_token 'in' expression 'on' expression 'equals' expression join_into_clause?
+  : modifier* 'join' type? identifier_token 'in' expression 'on' expression 'equals' expression join_into_clause?
   ;
 
 join_into_clause

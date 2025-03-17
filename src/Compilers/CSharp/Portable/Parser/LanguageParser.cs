@@ -13515,6 +13515,8 @@ done:
             switch (token.ContextualKind)
             {
                 case SyntaxKind.FromKeyword:
+                case SyntaxKind.LeftKeyword:
+                case SyntaxKind.RightKeyword:
                 case SyntaxKind.JoinKeyword:
                 case SyntaxKind.IntoKeyword:
                 case SyntaxKind.WhereKeyword:
@@ -13614,7 +13616,7 @@ done:
                         var fc = this.ParseFromClause();
                         clauses.Add(fc);
                         continue;
-                    case SyntaxKind.JoinKeyword:
+                    case SyntaxKind.JoinKeyword or SyntaxKind.LeftKeyword or SyntaxKind.RightKeyword:
                         clauses.Add(this.ParseJoinClause());
                         continue;
                     case SyntaxKind.LetKeyword:
@@ -13684,8 +13686,16 @@ done:
 
         private JoinClauseSyntax ParseJoinClause()
         {
-            Debug.Assert(this.CurrentToken.ContextualKind == SyntaxKind.JoinKeyword);
+            Debug.Assert(this.CurrentToken.ContextualKind is
+                SyntaxKind.JoinKeyword or SyntaxKind.LeftKeyword or SyntaxKind.RightKeyword);
+
+            var leftOrRightKeyword =
+                this.CurrentToken.ContextualKind is SyntaxKind.LeftKeyword or SyntaxKind.RightKeyword
+                    ? this.EatToken()
+                    : null;
+
             return _syntaxFactory.JoinClause(
+                leftOrRightKeyword,
                 joinKeyword: this.EatContextualToken(SyntaxKind.JoinKeyword),
                 type: this.PeekToken(1).Kind != SyntaxKind.InKeyword
                     ? this.ParseType()
@@ -13697,9 +13707,26 @@ done:
                 leftExpression: this.ParseExpressionCore(),
                 equalsKeyword: this.EatContextualToken(SyntaxKind.EqualsKeyword, ErrorCode.ERR_ExpectedContextualKeywordEquals),
                 rightExpression: this.ParseExpressionCore(),
-                into: this.CurrentToken.ContextualKind == SyntaxKind.IntoKeyword
-                    ? _syntaxFactory.JoinIntoClause(ConvertToKeyword(this.EatToken()), this.ParseIdentifierToken())
-                    : null);
+                parseJoinIntoClause());
+
+            JoinIntoClauseSyntax parseJoinIntoClause()
+            {
+                if (this.CurrentToken.ContextualKind != SyntaxKind.IntoKeyword)
+                {
+                    return null;
+                }
+
+                var clause = _syntaxFactory.JoinIntoClause(
+                    ConvertToKeyword(this.EatToken()),
+                    this.ParseIdentifierToken());
+
+                if (leftOrRightKeyword is not null)
+                {
+                    clause = AddError(clause, ErrorCode.ERR_LeftRightJoinNotSupportedWithInto);
+                }
+
+                return clause;
+            }
         }
 
         private LetClauseSyntax ParseLetClause()
